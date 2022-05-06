@@ -118,7 +118,7 @@
     async function displayWeather(){
 
         let city = document.getElementById("city").value;
-        let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=ddf620ef91b26800e6f09f3985fd54f0&units=metric`;
+        let url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=ddf620ef91b26800e6f09f3985fd54f0&units=metric`;
         document.getElementById("map").innerHTML = `<iframe width="880" height="480" id="gmap_canvas" src="https://maps.google.com/maps?q=${city}&t=&z=13&ie=UTF8&iwloc=&output=embed" frameborder="0" scrolling="no" marginheight="0" marginwidth="0">
         </iframe>`;
         try{
@@ -231,7 +231,7 @@
             day.innerText = days[dayNum];
 
             let img = document.createElement("img");
-            img.src = `http://openweathermap.org/img/wn/${elem.weather[0].icon}@2x.png`;
+            img.src = `https://openweathermap.org/img/wn/${elem.weather[0].icon}@2x.png`;
             img.style.height = "35px";
 
             let p1 = document.createElement("p");
