@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300&display=swap" rel="stylesheet">
+    <title>Weather app</title>
+    <style>
+        body {
+            background-image: url(https://www.survivingwithandroid.com/wp-content/uploads/2014/11/android_weather_app.jpg);
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+        .container {
+            height: 480px;
+            display: flex;
+            justify-content: space-around;
+        }
+        #info {
+            width: 30%;
+            border-radius: 10px;
+        }
+        #search {
+            height: 88%;
+        }
+        #user {
+            height: 10%;
+            display: flex;
+            justify-content: space-around;
+            margin-top: 2%;
+        }
+        input {
+            height: 40px;
+            width: 80%;
+            border-radius: 10px;
+        }
+        button {
+            height: 43px;
+            width: 43px;
+            border-radius: 5em;
+            background: url(https://cdn.ventusky.com/images/icons/misc-location-white.svg) 50% 50% no-repeat;
+            background-size: 50%;
+            background-color: #3697d1;
+            border: transparent;
+            cursor: pointer;
+        }
+        #temp, #wind, #clouds, #sunrise, #sunset {
+            margin-left: 10%;
+            width: 80%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h1,h2 {
+            font-family: 'Chakra Petch', sans-serif;
+            margin-left: 5%;
+        }
+        h1 {
+            color: purple;
+        }
+        p {
+            font-family: 'Chakra Petch', sans-serif;
+            color: purple;
+            font-weight: 700;
+        }
+        img {
+            height: 70px;
+        }
+        i {
+            font-size: 30px;
+            color: dimgray;
+        }
+        #map {
+            width: 65%;
+        }
+        iframe {
+            border-radius: 10px;
+            box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
+        }
+        #nextday {
+            margin: 1% 0% 0% 1%;
+            display: flex;
+            justify-content: space-around;
+            height: 180px;
+        }
+        .subdiv{
+            text-align: center;
+            width: 10%;
+            border-radius: 10px;
+            box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="info">
+            <div id="user">
+                <input id="city" type="text" placeholder="Search for city">
+                <button onclick="displayWeather()"></button>
+            </div>
+            <div id="search"></div>
+        </div>
+        <div id="map">
+        </div>
+    </div>
+    <div id="nextday">
+    </div>
+</body>
+</html>
+
+<script>
+    
+    async function displayWeather(){
+
+        let city = document.getElementById("city").value;
+        let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=ddf620ef91b26800e6f09f3985fd54f0&units=metric`;
+        document.getElementById("map").innerHTML = `<iframe width="880" height="480" id="gmap_canvas" src="https://maps.google.com/maps?q=${city}&t=&z=13&ie=UTF8&iwloc=&output=embed" frameborder="0" scrolling="no" marginheight="0" marginwidth="0">
+        </iframe>`;
+        try{
+            let mydata = await fetch(url);
+            let res = await mydata.json();
+            console.log(res);
+            showinfo(res);
+            next7days(res.coord.lat,res.coord.lat);
+        }
+        catch(err){
+            console.log(err);
+        }
+    }
+
+    
+
+    function showinfo(obj){
+
+        document.getElementById("search").innerHTML = null;
+
+        document.getElementById("info").style.backgroundColor = "white";
+
+        let weather = document.createElement("h2");
+        weather.innerHTML = "CURRENT WEATHER";
+
+        let city = document.createElement("h1");
+        city.innerHTML = `${obj.name}  ${Math.ceil(obj.main.temp)}°`;
+
+        let temp = document.createElement("div");
+        temp.id = "temp";
+        let img = document.createElement("img");
+        img.src = "https://ssl.gstatic.com/onebox/weather/64/sunny_s_cloudy.png";
+        let pTemp1 = document.createElement("p");
+        pTemp1.innerText =  `Max. Temp: ${Math.ceil(obj.main.temp_max)}°`;
+        let pTemp2 = document.createElement("p");
+        pTemp2.innerText = `Min. Temp: ${Math.floor(obj.main.temp_min)}°`;
+
+        temp.append(img,pTemp1,pTemp2);
+
+        let wind = document.createElement("div");
+        wind.id = "wind";
+        wind.innerHTML = "<i class='fas fa-wind'></i>";
+        let pWind = document.createElement("p");
+        pWind.innerText = `Wind Speed: ${obj.wind.speed} meter/sec`;
+
+        wind.append(pWind);
+
+        let clouds = document.createElement("div");
+        clouds.id = "clouds";
+        clouds.innerHTML = "<i class='fas fa-clouds'></i>";
+        let pcloud = document.createElement("p");
+        pcloud.innerText = `Clouds: ${obj.clouds.all}%`;
+
+        clouds.append(pcloud);
+
+        let sunrise = document.createElement("div");
+        sunrise.id = "sunrise";
+        sunrise.innerHTML = "<i class='fas fa-sunrise'></i>";
+        let pRise = document.createElement("p");
+        
+        let convers = new Date(obj.sys.sunrise * 100);
+        let hours = convers.getUTCHours().toString().padStart(2,0);
+        let min = convers.getUTCMinutes().toString().padStart(2,0);
+        let sec = convers.getUTCSeconds().toString().padStart(2,0);
+        pRise.innerText = `Sunrise ${hours}:${min}:${sec}`;
+
+        sunrise.append(pRise);
+
+        let sunset = document.createElement("div");
+        sunset.id = "sunset";
+        sunset.innerHTML = "<i class='fas fa-sunset'></i>";
+        let pSet = document.createElement("p");
+
+        let convers1 = new Date(obj.sys.sunset * 100);
+        let hours1 = convers1.getUTCHours().toString().padStart(2,0);
+        let min1 = convers1.getUTCMinutes().toString().padStart(2,0);
+        let sec1 = convers1.getUTCSeconds().toString().padStart(2,0);
+        pSet.innerText = `Sunset ${hours1}:${min1}:${sec1}`;
+
+        sunset.append(pSet);
+
+        document.getElementById("search").append(weather,city,temp,wind,clouds,sunrise,sunset);
+    }
+
+    async function next7days(lat,lon){
+
+        let url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=current,minutely,hourly,alerts&appid=ddf620ef91b26800e6f09f3985fd54f0&units=metric`;
+
+        let next = await fetch(url);
+        let res = await next.json();
+
+        show7(res.daily);
+
+        console.log(res);
+
+    }
+    
+    function show7(arr){
+        document.getElementById("nextday").innerHTML = null;
+        
+        arr.forEach(function(elem){
+            let div = document.createElement("div");
+            div.setAttribute("class","subdiv");
+            div.style.backgroundColor = "#e0e0e0";
+
+            let day = document.createElement("p");
+            
+            var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']; 
+            var dayNum = new Date(elem.dt * 1000).getDay();
+            day.innerText = days[dayNum];
+
+            let img = document.createElement("img");
+            img.src = `http://openweathermap.org/img/wn/${elem.weather[0].icon}@2x.png`;
+            img.style.height = "35px";
+
+            let p1 = document.createElement("p");
+            p1.innerText = `${Math.ceil(elem.temp.max)}°`;
+
+            let p2 = document.createElement("p");
+            p2.innerText = `${Math.floor(elem.temp.min)}°`;
+
+            div.append(day,img,p1,p2);
+
+            document.getElementById("nextday").append(div);
+
+        })
+    }
+
+</script>
